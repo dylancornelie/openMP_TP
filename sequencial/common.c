@@ -21,57 +21,75 @@
 
 #include "common.h"
 float Target[NUMPAT][NUMOUT];
-int   Validation[NUMRPAT];
+int Validation[NUMRPAT];
 float WeightIH[NUMHID][NUMIN];
 float WeightHO[NUMOUT][NUMHID];
 
-char *readImg( FILE *fd ){
+char *readImg(FILE *fd)
+{
 
-    char *img;
+	char *img;
 
-    img = (char *)malloc(1024);
+	img = (char *)malloc(1024);
 
-	for( int i = 0; i < 32; i++ ){
-        	fscanf(fd, "%s\n", &img[i*32]);
-		for(int j = 0; j < 32; j++) img[i*32+j] -= '0';
+	for (int i = 0; i < 32; i++)
+	{
+		if (fscanf(fd, "%s\n", &img[i * 32]) != 1)
+			return NULL;
+		for (int j = 0; j < 32; j++)
+			img[i * 32 + j] -= '0';
 	}
 
-    return img;
+	return img;
 }
 
-char **loadPatternSet(int nf, char *fname, int trainS){
+char **loadPatternSet(int nf, char *fname, int trainS)
+{
 
-    char **tset;
+	char **tset;
 	FILE *fd;
 	int c;
 
-	if( (fd = fopen( fname, "rb" )) == NULL) return NULL;
+	if ((fd = fopen(fname, "rb")) == NULL)
+		return NULL;
 
-        tset = (char **)malloc(nf*sizeof(char *));
-        int error = 0;
+	tset = (char **)malloc(nf * sizeof(char *));
+	int error = 0;
 
-        for (int i = 0; i < nf; i++){
-                if ((tset[i] = readImg( fd )) == NULL) { error = 1; break; }
-                memset( &Target[i], 0, 10*sizeof(float) );
-                fscanf( fd, "%d\n", &c );
-                if (trainS) Target[i][c] = 1.0;
-                	else Validation[i] = c;
-        }
+	for (int i = 0; i < nf; i++)
+	{
+		if ((tset[i] = readImg(fd)) == NULL)
+		{
+			error = 1;
+			break;
+		}
+		memset(&Target[i], 0, 10 * sizeof(float));
+		if (fscanf(fd, "%d\n", &c) != 1)
+			return NULL;
+		if (trainS)
+			Target[i][c] = 1.0;
+		else
+			Validation[i] = c;
+	}
 	fclose(fd);
 
-    if (error) return NULL;
-    return tset;
+	if (error)
+		return NULL;
+	return tset;
 }
 
-void printImg( char *Img, int x ){
+void printImg(char *Img, int x)
+{
 
 	printf("Pattern:\n");
-	for (int i = 0; i < 1024; i++ ){
-		printf("%c", Img[i] + '0' );
-		if (( i != 0 ) && !( i%32 )) printf("\n");
+	for (int i = 0; i < 1024; i++)
+	{
+		printf("%c", Img[i] + '0');
+		if ((i != 0) && !(i % 32))
+			printf("\n");
 	}
 	printf("\nTarget:\n");
-	for (int i = 0; i < 10; i++ ) printf("%f ",Target[x][i]);
+	for (int i = 0; i < 10; i++)
+		printf("%f ", Target[x][i]);
 	printf("\n");
 }
- 
