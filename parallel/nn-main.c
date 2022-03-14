@@ -150,9 +150,6 @@ void trainN()
                             Hidden[j] = 1.0 / (1.0 + exp(-SumH));
                     }
 
-                    // // Wait for all Hidden[j] to be computed
-                    // #pragma omp barrier
-
                     #pragma omp for
                     for (int k = 0; k < NUMOUT; k++)
                     {
@@ -207,7 +204,7 @@ void trainN()
             {
                 printf("\nEpoch %-5d :   Error = %f \n", epoch, Error);
                 continueLearning = 0;
-                // break; // Still does not work
+                // break; // Still does not work with single region
             }
         }
     }
@@ -223,12 +220,12 @@ void printRecognized(int p, float Output[])
     for (int i = 1; i < NUMOUT; i++)
         if (Output[i] > Output[imax])
             imax = i;
-    // printf("El patró %d sembla un %c\t i és un %d", p, '0' + imax, Validation[p]);
+    printf("El patró %d sembla un %c\t i és un %d", p, '0' + imax, Validation[p]);
     if (imax == Validation[p])
         total++;
-    // for (int k = 0; k < NUMOUT; k++)
-    //     printf("\t%f\t", Output[k]);
-    // printf("\n");
+    for (int k = 0; k < NUMOUT; k++)
+        printf("\t%f\t", Output[k]);
+    printf("\n");
 }
 
 void runN()
